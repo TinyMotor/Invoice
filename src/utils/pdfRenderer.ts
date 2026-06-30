@@ -44,7 +44,7 @@ export async function renderPdfFile(
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({
     data: arrayBuffer,
-    cMapUrl: '/cmaps/',
+    cMapUrl: `${import.meta.env.BASE_URL}cmaps/`,
     cMapPacked: true,
   }).promise;
   const totalPages = pdf.numPages;

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useAppStore } from '@/stores/appStore';
 import { MAX_HISTORY } from '@/utils/constants';
+import { uuid } from '@/utils/uuid';
 import type { HistoryRecord, PdfPage } from '@/types';
 
 export function useHistory() {
@@ -10,7 +11,7 @@ export function useHistory() {
   const recordPrint = useCallback(
     (pages: PdfPage[]) => {
       const record: HistoryRecord = {
-        id: crypto.randomUUID(),
+        id: uuid(),
         printedAt: Date.now(),
         pageCount: pages.length,
         fileNames: Array.from(new Set(pages.map((p) => p.fileName))),

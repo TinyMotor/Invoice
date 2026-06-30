@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useAppStore } from '@/stores/appStore';
 import { MAX_TEMPLATES } from '@/utils/constants';
+import { uuid } from '@/utils/uuid';
 import type { LayoutTemplate, PdfPage, PrintSettings } from '@/types';
 
 export function useTemplates() {
@@ -14,7 +15,7 @@ export function useTemplates() {
         return { success: false, message: `最多保存 ${MAX_TEMPLATES} 个模板` };
       }
       const template: LayoutTemplate = {
-        id: crypto.randomUUID(),
+        id: uuid(),
         name: name.trim() || `模板 ${templates.length + 1}`,
         createdAt: Date.now(),
         pages: pages.map((p) => ({ ...p })),
