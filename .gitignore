@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+*.local
+
+# Vite cache
+.vite/
+.turbo/
+
+# Editor / IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test / debug artifacts
+tmp-*
+test-*
+*.tmp
+*.bak
+
+# Editor history backups
+.history/
+*.local
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Vite plugin trae solo badge
+.vite-plugin-trae-solo-badge/
+
+# Generated sample files
+sample-invoice-*.pdf
