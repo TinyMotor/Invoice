@@ -3,7 +3,6 @@ import { Printer, FileDown, AlertCircle } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { useHistory } from '@/hooks/useHistory';
 import { exportMergedPdf } from '@/utils/pdfExporter';
-import { triggerPrint } from '@/utils/exportPdf';
 import { cn } from '@/lib/utils';
 
 export function ActionBar() {
@@ -11,13 +10,29 @@ export function ActionBar() {
   const settings = useAppStore((state) => state.settings);
   const { recordPrint } = useHistory();
   const [exporting, setExporting] = useState(false);
+  const [printing, setPrinting] = useState(false);
 
   const hasPages = pages.length > 0;
 
-  const handlePrint = () => {
-    if (!hasPages) return;
-    recordPrint(pages);
-    triggerPrint();
+  const handlePrint = async () => {
+    if (!hasPages || printing) return;
+    setPrinting(true);
+    try {
+      const pdfBytes = await exportMergedPdf(pages, settings);
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const printWindow = window.open(url, '_blank', 'noopener,noreferrer');
+      if (!printWindow) {
+        window.location.href = url;
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      recordPrint(pages);
+    } catch (err) {
+      console.error('生成打印 PDF 失败', err);
+      alert('生成打印 PDF 失败，请重试');
+    } finally {
+      setPrinting(false);
+    }
   };
 
   const handleExportPdf = async () => {
@@ -59,16 +74,16 @@ export function ActionBar() {
         <button
           type="button"
           onClick={handlePrint}
-          disabled={!hasPages}
+          disabled={!hasPages || printing}
           className={cn(
             'flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold shadow-sm transition-all',
-            !hasPages
+            !hasPages || printing
               ? 'cursor-not-allowed bg-slate-100 text-slate-400'
               : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-md active:translate-y-px',
           )}
         >
           <Printer className="h-4 w-4" />
-          打印
+          {printing ? '准备中…' : '打印'}
         </button>
         <button
           type="button"
@@ -88,9 +103,7 @@ export function ActionBar() {
 
       <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
         <span>共 {pages.length} 页发票</span>
-        <span>
-          预计 {Math.ceil(pages.length / 2)} 张 A4
-        </span>
+        <span>预计 {Math.ceil(pages.length / 2)} 张 A4</span>
       </div>
     </div>
   );
