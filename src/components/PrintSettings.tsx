@@ -131,6 +131,22 @@ export function PrintSettings() {
           />
         </div>
 
+        <div>
+          <div className="mb-1 flex items-center justify-between text-xs font-medium text-slate-600">
+            <span>发票缩放</span>
+            <span className="font-mono text-slate-500">{Math.round(settings.scale * 100)}%</span>
+          </div>
+          <input
+            type="range"
+            min={50}
+            max={150}
+            step={5}
+            value={Math.round(settings.scale * 100)}
+            onChange={(e) => update({ scale: Number(e.target.value) / 100 })}
+            className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-indigo-500"
+          />
+        </div>
+
         <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-100 bg-slate-50 p-3 transition-colors hover:bg-slate-100">
           <input
             type="checkbox"

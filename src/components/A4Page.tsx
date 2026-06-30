@@ -4,12 +4,10 @@ import { PdfPageImage } from './PdfPageImage';
 interface A4PageProps {
   pages: PdfPage[];
   settings: PrintSettings;
-  pageIndex: number;
-  totalPages: number;
   forPrint?: boolean;
 }
 
-export function A4Page({ pages, settings, pageIndex, totalPages, forPrint = false }: A4PageProps) {
+export function A4Page({ pages, settings, forPrint = false }: A4PageProps) {
   const isPortrait = settings.orientation === 'portrait';
   const widthMm = isPortrait ? 210 : 297;
   const heightMm = isPortrait ? 297 : 210;
@@ -51,10 +49,6 @@ export function A4Page({ pages, settings, pageIndex, totalPages, forPrint = fals
           </div>
         );
       })}
-
-      <div className="absolute bottom-2 right-3 text-[10px] text-slate-400">
-        第 {pageIndex + 1} / {totalPages} 页
-      </div>
     </div>
   );
 }

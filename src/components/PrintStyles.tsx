@@ -23,14 +23,7 @@ export function PrintContainer() {
       style={{ display: 'none' }}
     >
       {layoutPages.map((pagePages, index) => (
-        <A4Page
-          key={index}
-          pages={pagePages}
-          settings={settings}
-          pageIndex={index}
-          totalPages={layoutPages.length}
-          forPrint
-        />
+        <A4Page key={index} pages={pagePages} settings={settings} forPrint />
       ))}
     </div>,
     document.body,

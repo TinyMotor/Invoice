@@ -100,12 +100,7 @@ export function PrintPreview() {
           style={{ transform: `scale(${previewScale})` }}
         >
           {currentPage.length > 0 ? (
-            <A4Page
-              pages={currentPage}
-              settings={settings}
-              pageIndex={pageIndex}
-              totalPages={layoutPages.length}
-            />
+            <A4Page pages={currentPage} settings={settings} />
           ) : (
             <div className="flex h-[400px] w-[300px] items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white text-sm text-slate-500">
               请先上传 PDF 发票

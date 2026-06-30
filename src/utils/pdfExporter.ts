@@ -55,18 +55,23 @@ export async function exportMergedPdf(
         image = await pdfDoc.embedJpg(imageBytes);
       }
 
+      const slotWidthScaled = contentWidth * settings.scale;
+      const slotHeightScaled = slotHeight * settings.scale;
       const fitted = fitImageToRect(
         image.width,
         image.height,
-        contentWidth,
-        slotHeight,
+        slotWidthScaled,
+        slotHeightScaled,
       );
 
-      const x = settings.marginLeft * MM_TO_PT + (contentWidth - fitted.width) / 2;
+      const x =
+        settings.marginLeft * MM_TO_PT +
+        (contentWidth - fitted.width) / 2;
       const y =
         pageHeightPt -
         settings.marginTop * MM_TO_PT -
         j * (slotHeight + settings.invoiceGap * MM_TO_PT) -
+        (slotHeight - fitted.height) / 2 -
         fitted.height;
 
       page.drawImage(image, {
