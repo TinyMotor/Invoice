@@ -56,3 +56,6 @@ coverage/
 
 # Generated sample files
 sample-invoice-*.pdf
+
+
+.trae
