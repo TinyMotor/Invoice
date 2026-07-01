@@ -22,53 +22,48 @@ export function ActionBar() {
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
 
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
-        alert('请允许浏览器弹窗以使用打印功能');
-        URL.revokeObjectURL(url);
-        return;
-      }
+      // Hidden iframe: load PDF invisibly and trigger system print dialog directly
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.left = '-9999px';
+      iframe.style.top = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = 'none';
+      iframe.style.visibility = 'hidden';
+      document.body.appendChild(iframe);
 
-      printWindow.document.write(`<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>打印发票</title>
-<style>
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
-  embed { display: block; width: 100vw; height: 100vh; border: 0; }
-</style>
-</head>
-<body>
-<embed src="${url}" type="application/pdf">
-<script>
-  (function () {
-    var called = false;
-    function doPrint() {
-      if (called) return;
-      called = true;
-      try { window.print(); } catch (e) { console.warn(e); }
-    }
-    window.addEventListener('load', function () { setTimeout(doPrint, 800); });
-    setTimeout(doPrint, 2500);
-  })();
-<\/script>
-</body>
-</html>`);
-      printWindow.document.close();
-      printWindow.focus();
+      let printed = false;
+      let fallbackTimer: ReturnType<typeof setTimeout>;
 
-      const checkClosed = setInterval(() => {
-        if (printWindow.closed) {
-          clearInterval(checkClosed);
+      const cleanup = () => {
+        clearTimeout(fallbackTimer);
+        setTimeout(() => {
+          if (iframe.parentNode) document.body.removeChild(iframe);
           URL.revokeObjectURL(url);
-        }
-      }, 1000);
-      setTimeout(() => {
-        clearInterval(checkClosed);
-        URL.revokeObjectURL(url);
-      }, 5 * 60 * 1000);
+        }, 10_000);
+      };
 
+      const doPrint = () => {
+        if (printed) return;
+        printed = true;
+        try {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+          cleanup();
+        } catch (e) {
+          console.warn('iframe 打印失败，回退到新窗口', e);
+          window.open(url, '_blank');
+          cleanup();
+        }
+      };
+
+      iframe.onload = () => setTimeout(doPrint, 500);
+      fallbackTimer = setTimeout(() => {
+        if (!printed) doPrint();
+      }, 3000);
+
+      iframe.src = url;
       recordPrint(pages);
     } catch (err) {
       console.error('生成打印 PDF 失败', err);
