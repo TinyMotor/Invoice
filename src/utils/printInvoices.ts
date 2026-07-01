@@ -1,7 +1,18 @@
 import type { PdfPage, PrintSettings } from '@/types';
 import { PAPER_SIZES } from './constants';
+import { isMobile, isInAppBrowser } from './browser';
 
 export function printInvoices(pages: PdfPage[], settings: PrintSettings): void {
+  if (pages.length === 0) return;
+
+  if (isMobile()) {
+    const tip = isInAppBrowser()
+      ? '移动端内置浏览器不支持直接打印。\n\n请点击右上角菜单 →「在浏览器中打开」，\n然后使用「导出 PDF」功能，导出后在系统 PDF 查看器中打印。'
+      : '移动端浏览器不支持直接调起打印服务。\n\n建议使用「导出 PDF」功能，\n导出后在系统 PDF 查看器中点击打印。';
+    alert(tip);
+    return;
+  }
+
   const paper = PAPER_SIZES[settings.paperSize];
   const isPortrait = settings.orientation === 'portrait';
   const pageWidthMm = isPortrait ? paper.width : paper.height;

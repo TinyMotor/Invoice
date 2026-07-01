@@ -4,6 +4,7 @@ import { useAppStore } from '@/stores/appStore';
 import { useHistory } from '@/hooks/useHistory';
 import { exportMergedPdf } from '@/utils/pdfExporter';
 import { printInvoices } from '@/utils/printInvoices';
+import { isMobile, isInAppBrowser, blobToDataUrl } from '@/utils/browser';
 import { cn } from '@/lib/utils';
 
 export function ActionBar() {
@@ -34,15 +35,8 @@ export function ActionBar() {
     setExporting(true);
     try {
       const pdfBytes = await exportMergedPdf(pages, settings);
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `合并发票_${new Date().toISOString().slice(0, 10)}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const filename = `合并发票_${new Date().toISOString().slice(0, 10)}.pdf`;
+      await downloadPdf(pdfBytes, filename);
       recordPrint(pages);
     } catch (err) {
       console.error('导出 PDF 失败', err);
@@ -101,4 +95,53 @@ export function ActionBar() {
       </div>
     </div>
   );
+}
+
+/**
+ * 多策略 PDF 下载
+ * 1. 内置浏览器（微信/QQ等）→ 提示用户「在浏览器中打开」
+ * 2. 移动端普通浏览器 → data URL + a.download（更兼容）
+ * 3. 桌面端 → blob URL + a.download
+ */
+async function downloadPdf(bytes: Uint8Array, filename: string): Promise<void> {
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+
+  if (isInAppBrowser()) {
+    // 内置浏览器：blob URL 跳转后失效，data URL 通常也会被拦截
+    // 直接提示用户在系统浏览器中打开
+    alert(
+      '当前内置浏览器不支持直接下载文件。\n\n请点击右上角菜单 →「在浏览器中打开」本页面后，再点击「导出 PDF」。',
+    );
+    return;
+  }
+
+  if (isMobile()) {
+    // 移动端普通浏览器：data URL 更兼容
+    // iOS Safari 会显示 PDF，用户可保存到「文件」App
+    // Android Chrome 通常会直接下载
+    try {
+      const dataUrl = await blobToDataUrl(blob);
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = filename;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    } catch (err) {
+      console.warn('data URL 下载失败，回退到 blob URL', err);
+    }
+  }
+
+  // 桌面端：blob URL + download 属性
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
