@@ -34,9 +34,9 @@ export function PrintPreview() {
         fullscreen ? 'fixed inset-0 z-50' : 'h-full min-h-[600px]',
       )}
     >
-      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
+      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-3 py-2 sm:px-4 sm:py-3">
         <div className="text-sm font-semibold text-slate-700">打印预览</div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <div className="flex items-center rounded-lg border border-slate-200 bg-slate-50 p-0.5">
             <button
               type="button"
@@ -69,7 +69,7 @@ export function PrintPreview() {
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="min-w-[56px] text-center text-xs font-medium text-slate-600">
+            <span className="min-w-[48px] text-center text-[11px] font-medium text-slate-600 sm:min-w-[56px] sm:text-xs">
               {pages.length > 0 ? pageIndex + 1 : 0} / {layoutPages.length}
             </span>
             <button

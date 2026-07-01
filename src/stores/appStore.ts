@@ -12,6 +12,7 @@ interface AppState {
   previewScale: number;
   sidebarOpen: boolean;
   rightPanelOpen: boolean;
+  mobileView: 'preview' | 'list' | 'settings';
 
   setPages: (pages: PdfPage[]) => void;
   addPages: (pages: PdfPage[]) => void;
@@ -33,6 +34,7 @@ interface AppState {
   setPreviewScale: (scale: number) => void;
   setSidebarOpen: (open: boolean) => void;
   setRightPanelOpen: (open: boolean) => void;
+  setMobileView: (view: 'preview' | 'list' | 'settings') => void;
 }
 
 const storageOptions = {
@@ -55,6 +57,7 @@ export const useAppStore = create<AppState>()(
       previewScale: 0.75,
       sidebarOpen: true,
       rightPanelOpen: true,
+      mobileView: 'preview',
 
       setPages: (pages) => set({ pages }),
       addPages: (pages) => {
@@ -100,6 +103,7 @@ export const useAppStore = create<AppState>()(
       setPreviewScale: (scale) => set({ previewScale: scale }),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       setRightPanelOpen: (open) => set({ rightPanelOpen: open }),
+      setMobileView: (view) => set({ mobileView: view }),
     }),
     storageOptions,
   ),
