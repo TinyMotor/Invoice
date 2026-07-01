@@ -72,7 +72,10 @@ function polyfillRandomUUID() {
 function polyfillUint8ArrayHelpers() {
   if (typeof Uint8Array === 'undefined') return;
 
-  if (typeof Uint8Array.prototype.toHex !== 'function') {
+  const proto = Uint8Array.prototype as unknown as Record<string, unknown>;
+  const ctor = Uint8Array as unknown as Record<string, unknown>;
+
+  if (typeof proto.toHex !== 'function') {
     Object.defineProperty(Uint8Array.prototype, 'toHex', {
       value: function toHex(this: Uint8Array): string {
         let out = '';
@@ -86,7 +89,7 @@ function polyfillUint8ArrayHelpers() {
     });
   }
 
-  if (typeof (Uint8Array as unknown as { fromHex?: unknown }).fromHex !== 'function') {
+  if (typeof ctor.fromHex !== 'function') {
     Object.defineProperty(Uint8Array, 'fromHex', {
       value: function fromHex(hex: string): Uint8Array {
         const clean = hex.replace(/\s+/g, '');
@@ -108,7 +111,7 @@ function polyfillUint8ArrayHelpers() {
     });
   }
 
-  if (typeof Uint8Array.prototype.toBase64 !== 'function') {
+  if (typeof proto.toBase64 !== 'function') {
     Object.defineProperty(Uint8Array.prototype, 'toBase64', {
       value: function toBase64(this: Uint8Array): string {
         let binary = '';
@@ -122,7 +125,7 @@ function polyfillUint8ArrayHelpers() {
     });
   }
 
-  if (typeof (Uint8Array as unknown as { fromBase64?: unknown }).fromBase64 !== 'function') {
+  if (typeof ctor.fromBase64 !== 'function') {
     Object.defineProperty(Uint8Array, 'fromBase64', {
       value: function fromBase64(b64: string): Uint8Array {
         const binary = atob(b64);
