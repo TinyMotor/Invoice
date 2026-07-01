@@ -4,6 +4,8 @@ import { cn } from '@/lib/utils';
 
 interface PdfPageThumbnailProps {
   page: PdfPage;
+  index: number;
+  total: number;
   isSelected: boolean;
   onSelect: () => void;
   onRemove: () => void;
@@ -12,6 +14,8 @@ interface PdfPageThumbnailProps {
 
 export function PdfPageThumbnail({
   page,
+  index,
+  total,
   isSelected,
   onSelect,
   onRemove,
@@ -35,7 +39,7 @@ export function PdfPageThumbnail({
           loading="lazy"
         />
         <div className="absolute right-1 top-1 rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white">
-          {page.pageNumber}/{page.totalPages}
+          {index}/{total}
         </div>
       </div>
       <div className="flex items-center justify-between gap-2">

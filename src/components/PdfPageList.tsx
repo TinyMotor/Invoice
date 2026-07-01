@@ -28,10 +28,12 @@ export function PdfPageList() {
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
-          {pages.map((page) => (
+          {pages.map((page, index) => (
             <PdfPageThumbnail
               key={page.id}
               page={page}
+              index={index + 1}
+              total={pages.length}
               isSelected={page.id === selectedPageId}
               onSelect={() => selectPage(page.id)}
               onRemove={() => removePage(page.id)}
