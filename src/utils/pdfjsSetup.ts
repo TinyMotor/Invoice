@@ -69,9 +69,79 @@ function polyfillRandomUUID() {
   });
 }
 
+function polyfillUint8ArrayHelpers() {
+  if (typeof Uint8Array === 'undefined') return;
+
+  if (typeof Uint8Array.prototype.toHex !== 'function') {
+    Object.defineProperty(Uint8Array.prototype, 'toHex', {
+      value: function toHex(this: Uint8Array): string {
+        let out = '';
+        for (let i = 0; i < this.length; i++) {
+          out += this[i].toString(16).padStart(2, '0');
+        }
+        return out;
+      },
+      configurable: true,
+      writable: true,
+    });
+  }
+
+  if (typeof (Uint8Array as unknown as { fromHex?: unknown }).fromHex !== 'function') {
+    Object.defineProperty(Uint8Array, 'fromHex', {
+      value: function fromHex(hex: string): Uint8Array {
+        const clean = hex.replace(/\s+/g, '');
+        if (clean.length % 2 !== 0) {
+          throw new SyntaxError('Input string has odd length');
+        }
+        const bytes = new Uint8Array(clean.length / 2);
+        for (let i = 0; i < bytes.length; i++) {
+          const b = parseInt(clean.slice(i * 2, i * 2 + 2), 16);
+          if (Number.isNaN(b)) {
+            throw new SyntaxError('Input string has invalid hex characters');
+          }
+          bytes[i] = b;
+        }
+        return bytes;
+      },
+      configurable: true,
+      writable: true,
+    });
+  }
+
+  if (typeof Uint8Array.prototype.toBase64 !== 'function') {
+    Object.defineProperty(Uint8Array.prototype, 'toBase64', {
+      value: function toBase64(this: Uint8Array): string {
+        let binary = '';
+        for (let i = 0; i < this.length; i++) {
+          binary += String.fromCharCode(this[i]);
+        }
+        return btoa(binary);
+      },
+      configurable: true,
+      writable: true,
+    });
+  }
+
+  if (typeof (Uint8Array as unknown as { fromBase64?: unknown }).fromBase64 !== 'function') {
+    Object.defineProperty(Uint8Array, 'fromBase64', {
+      value: function fromBase64(b64: string): Uint8Array {
+        const binary = atob(b64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes;
+      },
+      configurable: true,
+      writable: true,
+    });
+  }
+}
+
 export function installCryptoPolyfills(): void {
   installMapPolyfills();
   polyfillRandomUUID();
+  polyfillUint8ArrayHelpers();
 }
 
 // pdf.js 6.x calls crypto.randomUUID() during PDF parsing; some embedded

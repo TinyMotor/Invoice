@@ -3,6 +3,7 @@ import { Printer, FileDown, AlertCircle } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { useHistory } from '@/hooks/useHistory';
 import { exportMergedPdf } from '@/utils/pdfExporter';
+import { printInvoices } from '@/utils/printInvoices';
 import { cn } from '@/lib/utils';
 
 export function ActionBar() {
@@ -18,56 +19,11 @@ export function ActionBar() {
     if (!hasPages || printing) return;
     setPrinting(true);
     try {
-      const pdfBytes = await exportMergedPdf(pages, settings);
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-
-      // Hidden iframe: load PDF invisibly and trigger system print dialog directly
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'fixed';
-      iframe.style.left = '-9999px';
-      iframe.style.top = '0';
-      iframe.style.width = '0';
-      iframe.style.height = '0';
-      iframe.style.border = 'none';
-      iframe.style.visibility = 'hidden';
-      document.body.appendChild(iframe);
-
-      let printed = false;
-      let fallbackTimer: ReturnType<typeof setTimeout>;
-
-      const cleanup = () => {
-        clearTimeout(fallbackTimer);
-        setTimeout(() => {
-          if (iframe.parentNode) document.body.removeChild(iframe);
-          URL.revokeObjectURL(url);
-        }, 10_000);
-      };
-
-      const doPrint = () => {
-        if (printed) return;
-        printed = true;
-        try {
-          iframe.contentWindow?.focus();
-          iframe.contentWindow?.print();
-          cleanup();
-        } catch (e) {
-          console.warn('iframe 打印失败，回退到新窗口', e);
-          window.open(url, '_blank');
-          cleanup();
-        }
-      };
-
-      iframe.onload = () => setTimeout(doPrint, 500);
-      fallbackTimer = setTimeout(() => {
-        if (!printed) doPrint();
-      }, 3000);
-
-      iframe.src = url;
+      printInvoices(pages, settings);
       recordPrint(pages);
     } catch (err) {
-      console.error('生成打印 PDF 失败', err);
-      alert('生成打印 PDF 失败，请重试');
+      console.error('调起打印失败', err);
+      alert('调起打印失败，请改用「导出 PDF」后手动打印');
     } finally {
       setPrinting(false);
     }
