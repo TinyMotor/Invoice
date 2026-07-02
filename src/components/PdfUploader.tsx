@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback } from 'react';
-import { Upload, FileWarning, X } from 'lucide-react';
+import { Upload, FileWarning, X, ShieldCheck } from 'lucide-react';
 import { usePdfPages } from '@/hooks/usePdfPages';
 import type { FileValidationError } from '@/types';
 import { cn } from '@/lib/utils';
@@ -53,6 +53,14 @@ export function PdfUploader() {
 
   return (
     <div className="flex flex-col gap-3">
+      <div className="flex items-start gap-2 rounded-lg border border-emerald-100 bg-emerald-50/80 px-3 py-2 text-xs text-emerald-700">
+        <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <div className="leading-relaxed">
+          <span className="font-semibold">纯前端工具，隐私无忧</span>
+          <span className="ml-1 text-emerald-600">所有文件仅在浏览器本地处理，不会上传至服务器。</span>
+        </div>
+      </div>
+
       <div
         onClick={() => inputRef.current?.click()}
         onDragOver={onDragOver}

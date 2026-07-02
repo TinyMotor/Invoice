@@ -1,4 +1,4 @@
-import { Receipt, FileText, SlidersHorizontal } from 'lucide-react';
+import { Receipt, FileText, SlidersHorizontal, ShieldCheck } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { cn } from '@/lib/utils';
 
@@ -18,8 +18,13 @@ export function AppHeader() {
           <h1 className="truncate font-serif text-base font-bold text-slate-900 sm:text-lg">
             发票打印助手
           </h1>
-          <p className="hidden text-[10px] text-slate-500 sm:block">
-            A4 双发票智能排版 · 打印 · PDF 导出
+          <p className="hidden items-center gap-1 text-[10px] text-slate-500 sm:flex">
+            <span>A4 双发票智能排版 · 打印 · PDF 导出</span>
+            <span className="text-slate-300">·</span>
+            <span className="inline-flex items-center gap-0.5 text-emerald-600">
+              <ShieldCheck className="h-3 w-3" />
+              纯前端工具，文件不会上传
+            </span>
           </p>
         </div>
       </div>
